@@ -22,7 +22,8 @@ namespace SistemaDeTarefas.Migrations
                     Restricao = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     CEP = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     SENHA = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Tipo = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
+                    Tipo = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    GoogleLogin = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {

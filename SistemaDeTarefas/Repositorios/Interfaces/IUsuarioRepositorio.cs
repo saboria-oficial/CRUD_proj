@@ -1,13 +1,24 @@
-﻿using SistemaDeTarefas.Models;
+﻿// Importa o namespace necessário para os modelos de dados
+using SistemaDeTarefas.Models;
 
 namespace SistemaDeTarefas.Repositorios.Interfaces
 {
+    // Define a interface para o repositório de usuários
     public interface IUsuarioRepositorio
     {
+        // Método para buscar todos os usuários
         Task<List<UsuarioModel>> BuscarTodosUsuarios();
-        Task<UsuarioModel> BuscarPorId(int id);
+
+        // Método para buscar um usuário pelo email
+        Task<UsuarioModel> BuscarPorId(string email);
+
+        // Método para adicionar um novo usuário
         Task<UsuarioModel> Adicionar(UsuarioModel usuario);
-        Task<UsuarioModel> Atualizar(UsuarioModel usuario, int id);
-        Task<bool> Apagar(int id);
+
+        // Método para atualizar um usuário existente pelo email
+        Task<UsuarioModel> Atualizar(UsuarioModel usuario, string email);
+
+        // Método para apagar um usuário pelo email
+        Task<bool> Apagar(string email);
     }
 }
