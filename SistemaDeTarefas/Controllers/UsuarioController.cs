@@ -51,13 +51,18 @@ namespace SistemaDeTarefas.Controllers
             else
             {
                 string token = TokenGenerator.GenerateToken(email, senha);
+                ResponseLoginModel responseLogin = new ResponseLoginModel();
+
                 if (token != null)
                 {
-                    Response[] pessoas = new ResponseLoginModel[]
-                {
-                new ResponseLoginModel { Response = "true", Key = token } }
+                    responseLogin.Response = "succes";
+                    responseLogin.Key = token;
                 }
-                
+                else
+                {
+                    responseLogin.Response = "error";
+                    responseLogin.Key = null;
+                }
             }
             return Ok(Response); // Retorna uma resposta HTTP 200 OK com o usuário encontrado
         }
