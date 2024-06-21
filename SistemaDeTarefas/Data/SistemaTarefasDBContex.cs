@@ -15,6 +15,7 @@ namespace SistemaDeTarefas.Data
 
         // Define um DbSet para a entidade UsuarioModel, permitindo o acesso e manipulação dos usuários no banco de dados
         public DbSet<UsuarioModel> Usuarios { get; set; }
+        public DbSet<RestauranteModel> Restaurante {  get; set; }
 
         // Método que sobrescreve o comportamento padrão do EF Core para configurar o modelo
         protected override void OnModelCreating(ModelBuilder modelBuilder)
