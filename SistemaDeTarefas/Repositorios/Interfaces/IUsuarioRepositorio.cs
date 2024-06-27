@@ -8,6 +8,7 @@ namespace SistemaDeTarefas.Repositorios.Interfaces
     {
         // Método para buscar todos os usuários
         Task<List<UsuarioModel>> BuscarTodosUsuarios();
+       // Task<UsuarioModel> EnviarEmail(EmailModel email);
 
         // Método para buscar um usuário pelo email
         Task<UsuarioModel> BuscarPorId(string email);

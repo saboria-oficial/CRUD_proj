@@ -43,6 +43,8 @@ namespace SistemaDeTarefas
 
             // Adiciona a interface do repositório de usuário e sua implementação ao contêiner
             builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
+            builder.Services.AddScoped<IRestauranteRepositorio, RestauranteRepositorio>();
+            builder.Services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
 
             // Constrói a aplicação
             var app = builder.Build();

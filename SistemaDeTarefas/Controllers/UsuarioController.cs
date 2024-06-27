@@ -1,5 +1,7 @@
 ﻿using Azure;
 using Microsoft.AspNetCore.Http;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 using Microsoft.AspNetCore.Mvc;
 using SistemaDeTarefas.Models; // Importa o modelo UsuarioModel
 using SistemaDeTarefas.Repositorios; // Importa o namespace Repositorios
@@ -40,8 +42,8 @@ namespace SistemaDeTarefas.Controllers
         }
 
         // Endpoint para login
-        [HttpGet("{email}/{senha}")]
-        public async Task<ActionResult<UsuarioModel>> Login(string email, string senha)
+        [HttpGet("{email}/{key}")]
+        public async Task<ActionResult<UsuarioModel>> Login(string email, string key)
         {
             UsuarioModel usuario = await _usuarioRepositorio.BuscarPorId(email);
             if (usuario == null)
@@ -50,19 +52,70 @@ namespace SistemaDeTarefas.Controllers
             }
             else
             {
-                string token = TokenGenerator.GenerateToken(email, senha);
-                if (token != null)
+                Console.WriteLine($"Senha do usuário: {usuario.SENHA}");
+                if (key == usuario.SENHA)
                 {
-                    Response[] pessoas = new ResponseLoginModel[]
+                    string token = TokenGenerator.GenerateToken(email, key);
+                    ResponseLoginModel responseLogin = new ResponseLoginModel();
+
+                    Console.WriteLine("Token" + token);
+
+                    if (token != null)
+                    {
+                        responseLogin.Response = "succes";
+                        responseLogin.Key = token;
+                    }
+                    else
+                    {
+                        responseLogin.Response = "error";
+                        responseLogin.Key = null;
+                    }
+                    return Ok(responseLogin); // Retorna uma resposta HTTP 200 OK com o objeto responseLogin
+
+                }
+                else
                 {
-                new ResponseLoginModel { Response = "true", Key = token } }
+                    return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado
                 }
                 
+
+               
             }
-            return Ok(Response); // Retorna uma resposta HTTP 200 OK com o usuário encontrado
         }
 
+        // Enpoint de disparo de emil
+        //[HttpPost("api/email/enviar")]
+        //public async Task<ActionResult<string>> EnviarEmail([FromBody] EmailModel emailModel)
+        //{
+        //    try
+        //    {
+        //        var client = new SendGridClient("EM2YJC44WM75ZXE2C5M3SJQF");
 
+        //        var from = new EmailAddress("saboriaoficial@gmail.com", "Seu Nome");
+        //        var to = new EmailAddress(emailModel.Destinatario, "Destinatário");
+        //        var subject = emailModel.Subject;
+        //        var htmlContent = "";
+
+        //        var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlContent);
+
+        //        var response = await client.SendEmailAsync(msg);
+
+        //        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        //        {
+        //            return Ok("E-mail enviado com sucesso!");
+        //        }
+        //        else
+        //        {
+        //            return StatusCode(500, $"Erro ao enviar o e-mail: {response}");
+
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Erro ao enviar o e-mail: {ex.Message}");
+        //    }
+
+        //}
 
 
         // Endpoint para cadastrar um novo usuário

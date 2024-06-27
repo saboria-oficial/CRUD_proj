@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SistemaDeTarefas.Models; // Importa o modelo UsuarioModel
-using SistemaDeTarefas.Repositorios; // Importa o namespace Repositorios
-using SistemaDeTarefas.Repositorios.Interfaces; // Importa a interface IUsuarioRepositorio
+using SistemaDeTarefas.Models;
+using SistemaDeTarefas.Repositorios;
+using SistemaDeTarefas.Repositorios.Interfaces;
 
 namespace SistemaDeTarefas.Controllers
 {
@@ -10,65 +10,88 @@ namespace SistemaDeTarefas.Controllers
     [ApiController]
     public class RestauranteController : ControllerBase
     {
-        private readonly IUsuarioRepositorio _restauranteRepositorio;
-
-        // Construtor que injeta IUsuarioRepositorio para acesso ao repositório de usuários
-        public RestauranteController(IUsuarioRepositorio restauranteRepositorio)
+        private readonly IRestauranteRepositorio _restauranteRepositorio;
+        public RestauranteController(IRestauranteRepositorio restauranteRepositorio)
         {
             _restauranteRepositorio = restauranteRepositorio;
         }
 
-        // Endpoint para buscar todos os usuários
         [HttpGet]
         public async Task<ActionResult<List<RestauranteModel>>> BuscarTodosRestaurantes()
         {
-            List<RestauranteModel> usuarios = await _restauranteRepositorio.BuscarTodosRestaurantes();
-            return Ok(usuarios); // Retorna uma resposta HTTP 200 OK com a lista de usuários
+            List<RestauranteModel> restaurante = await _restauranteRepositorio.BuscarTodosRestaurantes();
+            return Ok(restaurante);
         }
 
-        // Endpoint para buscar um usuário por email
-        [HttpGet("{CNPJ}")]
-        public async Task<ActionResult<RestauranteModel>> BuscarPorCNPJ(string CNPJ)
+        [HttpGet("{cnpj}")]
+        public async Task<ActionResult<RestauranteModel>> BuscarPorCNPJ(string cnpj)
         {
-            RestauranteModel restaurante = await _restauranteRepositorio.BuscarPorId(CNPJ);
-            if (restaurante == null)
+            RestauranteModel restaurante = await _restauranteRepositorio.BuscarPorCNPJ(cnpj);
+            return Ok(restaurante);
+        }
+
+        [HttpGet("{cnpj}/{key}")]
+        public async Task<ActionResult<RestauranteModel>> Login(string cnpj, string key)
+        {
+            RestauranteModel rest = await _restauranteRepositorio.BuscarPorCNPJ(cnpj);
+            if (rest == null)
             {
                 return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado
             }
-            return Ok(restaurante); // Retorna uma resposta HTTP 200 OK com o usuário encontrado
+            else
+            {
+                Console.WriteLine($"Senha do usuário: {rest.Senha}");
+                if (key == rest.Senha)
+                {
+                    string token = TokenGenerator.GenerateToken(cnpj, key);
+                    ResponseLoginModel responseLogin = new ResponseLoginModel();
+
+                    Console.WriteLine("Token" + token);
+
+                    if (token != null)
+                    {
+                        responseLogin.Response = "succes";
+                        responseLogin.Key = token;
+                    }
+                    else
+                    {
+                        responseLogin.Response = "error";
+                        responseLogin.Key = null;
+                    }
+                    return Ok(responseLogin); // Retorna uma resposta HTTP 200 OK com o objeto responseLogin
+
+                }
+                else
+                {
+                    return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado
+                }
+
+
+
+            }
         }
 
-        // Endpoint para cadastrar um novo usuário
         [HttpPost]
-        public async Task<ActionResult<RestauranteModel>> Cadastrar([FromBody] RestauranteModel RestauranteModel)
+        public async Task<ActionResult<RestauranteModel>> Cadastrar([FromBody] RestauranteModel restauranteModel)
         {
-            RestauranteModel restaurante = await _restauranteRepositorio.Adicionar(RestauranteModel);
-            return Ok(restaurante); // Retorna uma resposta HTTP 200 OK com o usuário cadastrado
+            RestauranteModel restaurante = await _restauranteRepositorio.Adicionar(restauranteModel);
+            return Ok(restaurante);
         }
 
-        // Endpoint para atualizar um usuário por email
-        [HttpPut("{CNPJ}")]
-        public async Task<ActionResult<RestauranteModel>> Atualizar([FromBody] RestauranteModel RestauranteModel, string CNPJ)
+        [HttpPut("{cnpj}")]
+        public async Task<ActionResult<RestauranteModel>> Atualizar([FromBody] RestauranteModel restauranteModel, string cnpj)
         {
-            RestauranteModel.CNPJ = CNPJ; // Define o email do usuário no modelo recebido
-            RestauranteModel restaurante = await _restauranteRepositorio.Atualizar(RestauranteModel, CNPJ);
-            if (restaurante == null)
-            {
-                return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado para atualização
-            }
-            return Ok(restaurante); // Retorna uma resposta HTTP 200 OK com o usuário atualizado
+            restauranteModel.Cnpj = cnpj;
+            RestauranteModel restaurante = await _restauranteRepositorio.Atualizar(restauranteModel, cnpj);
+            return Ok(restaurante);
         }
 
-        // Endpoint para apagar um usuário por email
-        [HttpDelete("{CNPJ}")]
-        public async Task<ActionResult<bool>> Apagar(string CNPJ)
+        [HttpDelete("{cnpj}")]
+        public async Task<ActionResult<RestauranteModel>> Apagar([FromBody] RestauranteModel restauranteModel, string cnpj)
         {
-            bool apagado = await _restauranteRepositorio.Apagar(CNPJ);
-            if (!apagado)
-            {
-                return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado para exclusão
-            }
-            return Ok(apagado); // Retorna uma resposta HTTP 200 OK indicando se o usuário foi excluído com sucesso
+            bool apagado = await _restauranteRepositorio.Apagar(cnpj);
+            return Ok(apagado);
+
         }
     }
 }

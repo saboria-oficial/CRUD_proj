@@ -10,6 +10,8 @@
     {
         public static string GenerateToken(string username, string secretKey)
         {
+            //var adjustedKey = GenerateKeyFromPassword(password);
+
             // Definir as credenciais de segurança (a chave secreta e o algoritmo de assinatura)
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -17,9 +19,9 @@
             // Definir as reivindicações (claims) do token
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+                new Claim(JwtRegisteredClaimNames.Sub, username),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
             // Criar o token
             var token = new JwtSecurityToken(
@@ -31,6 +33,7 @@
 
             // Retornar o token em formato string
             return new JwtSecurityTokenHandler().WriteToken(token);
+
         }
     }
 }

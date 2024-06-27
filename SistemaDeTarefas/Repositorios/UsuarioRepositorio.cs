@@ -83,5 +83,10 @@ namespace SistemaDeTarefas.Repositorios
 
             return true;
         }
+
+       // public Task<UsuarioModel> EnviarEmail(EmailModel email)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

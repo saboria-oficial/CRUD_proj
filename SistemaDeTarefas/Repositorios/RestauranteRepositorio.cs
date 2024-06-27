@@ -1,83 +1,73 @@
-﻿using Microsoft.EntityFrameworkCore; // Namespace para trabalhar com Entity Framework Core
-using SistemaDeTarefas.Data; // Namespace onde está definido o contexto do banco de dados
-using SistemaDeTarefas.Models; // Namespace onde está definido o modelo UsuarioModel
-using SistemaDeTarefas.Repositorios.Interfaces; // Namespace onde está definida a interface IUsuarioRepositorio
-using System; // Namespace para a classe Exception
-using System.Collections.Generic; // Namespace para List<T>
-using System.Threading.Tasks; // Namespace para trabalhar com tarefas assíncronas
+﻿using Microsoft.EntityFrameworkCore;
+using SistemaDeTarefas.Data;
+using SistemaDeTarefas.Models;
+using SistemaDeTarefas.Repositorios.Interfaces;
 
 namespace SistemaDeTarefas.Repositorios
 {
-    // Implementação do repositório de usuários que utiliza Entity Framework Core
     public class RestauranteRepositorio : IRestauranteRepositorio
     {
-        private readonly SistemaTarefasDBContex _dbcontext;
-
-        // Construtor que recebe o contexto do banco de dados por injeção de dependência
+        private readonly SistemaTarefasDBContex _dbContext;
         public RestauranteRepositorio(SistemaTarefasDBContex sistemaTarefasDBContex)
         {
-            _dbcontext = sistemaTarefasDBContex;
+            _dbContext = sistemaTarefasDBContex;
+        }
+        public async Task<RestauranteModel> BuscarPorCNPJ(string cnpj)
+        {
+            return await _dbContext.Restaurante.FirstOrDefaultAsync(x => x.Cnpj == cnpj);
         }
 
-        // Método para buscar um usuário por email
-        public async Task<UsuarioModel> BuscarPorCNPJ(string email)
+        public async Task<List<RestauranteModel>> BuscarTodosRestaurantes()
         {
-            return await _dbcontext.Usuarios.FirstOrDefaultAsync(x => x.CNPJ == CNPJ);
+            return await _dbContext.Restaurante.ToListAsync();
         }
 
-        // Método para buscar todos os usuários
-        public async Task<List<UsuarioModel>> BuscarTodosRestaurantes()
+        public async Task<RestauranteModel> Adicionar(RestauranteModel rest)
         {
-            return await _dbcontext.Usuarios.ToListAsync();
+            await _dbContext.Restaurante.AddAsync(rest);
+            await _dbContext.SaveChangesAsync();
+
+            return rest;
         }
 
-        // Método para adicionar um novo usuário
-        public async Task<UsuarioModel> Adicionar(UsuarioModel usuario)
+        public async Task<RestauranteModel> Atualizar(RestauranteModel rest, string cnpj)
         {
-            await _dbcontext.Usuarios.AddAsync(usuario);
-            await _dbcontext.SaveChangesAsync();
-
-            return usuario;
-        }
-
-        // Método para atualizar um usuário
-        public async Task<UsuarioModel> Atualizar(UsuarioModel usuario, string CNPJ)
-        {
-            // Busca o usuário pelo CNPJ fornecido
-            UsuarioModel usuarioPorCNPJ = await BuscarPorId(CNPJ);
-            if (usuarioPorCNPJ == null)
+            RestauranteModel restaurantePorCNPJ = await BuscarPorCNPJ(cnpj);
+            if (restaurantePorCNPJ == null)
             {
-                throw new Exception($"Usuario para o CNPJ: {CNPJ} não foi encontrado.");
+                throw new Exception($"CNPJ do restaurante: {cnpj} não foi encontrado.");
             }
 
-            // Atualiza os dados do usuário com base no objeto recebido
-            usuarioPorCNPJ.Nome = usuario.Nome;
-            usuarioPorCNPJ.CNPJ = usuario.CNPJ;
-            usuarioPorCNPJ.Intoleracia = usuario.Intoleracia;
+            restaurantePorCNPJ.Nome = rest.Nome;
+            restaurantePorCNPJ.Cnpj = rest.Cnpj;
+            restaurantePorCNPJ.Intolerancia = rest.Intolerancia;
+            restaurantePorCNPJ.Senha = rest.Senha;
+            restaurantePorCNPJ.Telefone = rest.Telefone;
+            restaurantePorCNPJ.Cep = rest.Cep;
+            restaurantePorCNPJ.Email = rest.Email;
+            restaurantePorCNPJ.Culinaria = rest.Culinaria;
 
-            // Atualiza o usuário no contexto do banco de dados e salva as alterações
-            _dbcontext.Usuarios.Update(usuarioPorCNPJ);
-            await _dbcontext.SaveChangesAsync();
 
-            return usuarioPorCNPJ;
+
+        _dbContext.Restaurante.Update(restaurantePorCNPJ);
+            await _dbContext.SaveChangesAsync();
+            return restaurantePorCNPJ;
         }
 
-        // Método para apagar um usuário
-        public async Task<bool> Apagar(string email)
+        public async Task<bool> Apagar(string cnpj)
         {
-            // Busca o usuário pelo email fornecido
-            UsuarioModel usuarioPorId = await BuscarPorCNPJ(email);
-            if (usuarioPorId == null)
+            RestauranteModel restaurantePorCNPJ = await BuscarPorCNPJ(cnpj);
+            if (restaurantePorCNPJ == null)
             {
-                throw new Exception($"Usuario para o Email: {email} não foi encontrado.");
+                throw new Exception($"CNPJ do restaurante: {cnpj} não foi encontrado.");
             }
-
-            // Remove o usuário do contexto do banco de dados e salva as alterações
-            _dbcontext.Usuarios.Remove(usuarioPorId);
-            await _dbcontext.SaveChangesAsync();
-
+            _dbContext.Restaurante.Remove(restaurantePorCNPJ);
+            await _dbContext.SaveChangesAsync();   
             return true;
         }
+
+
+
+
     }
 }
-

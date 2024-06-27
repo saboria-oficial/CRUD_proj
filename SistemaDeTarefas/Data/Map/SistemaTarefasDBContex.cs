@@ -12,14 +12,21 @@ namespace SistemaDeTarefas.Data
             : base(options)
         {
         }
+        public DbSet<BlogModel> Blog { get; set; }
+
+        public DbSet<ProdutoModel> Produto { get; set; }
+
+        public DbSet<RestauranteModel> Restaurante { get; set; }
 
         // Define um DbSet para a entidade UsuarioModel, permitindo o acesso e manipulação dos usuários no banco de dados
         public DbSet<UsuarioModel> Usuarios { get; set; }
-        public DbSet<RestauranteModel> Restaurante {  get; set; }
+        //public DbSet<RestauranteModel> Restaurante {  get; set; }
 
         // Método que sobrescreve o comportamento padrão do EF Core para configurar o modelo
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new ProdutoMap());
+            modelBuilder.ApplyConfiguration(new RestauranteMap());
             // Aplica o mapeamento definido na classe UsuarioMap utilizando o modelBuilder
             modelBuilder.ApplyConfiguration(new UsuarioMap());
 
