@@ -10,7 +10,6 @@
     {
         public static string GenerateToken(string username, string secretKey)
         {
-            //var adjustedKey = GenerateKeyFromPassword(password);
 
             // Definir as credenciais de segurança (a chave secreta e o algoritmo de assinatura)
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));

@@ -1,11 +1,12 @@
 ﻿using Azure;
 using Microsoft.AspNetCore.Http;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+using System.Net;
+using System.Net.Mail;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SistemaDeTarefas.Models; // Importa o modelo UsuarioModel
-using SistemaDeTarefas.Repositorios; // Importa o namespace Repositorios
-using SistemaDeTarefas.Repositorios.Interfaces; // Importa a interface IUsuarioRepositorio
+using SistemaDeTarefas.Models; 
+using SistemaDeTarefas.Repositorios; 
+using SistemaDeTarefas.Repositorios.Interfaces; 
 
 namespace SistemaDeTarefas.Controllers
 {
@@ -26,7 +27,7 @@ namespace SistemaDeTarefas.Controllers
         public async Task<ActionResult<List<UsuarioModel>>> BuscarTodosUsuarios()
         {
             List<UsuarioModel> usuarios = await _usuarioRepositorio.BuscarTodosUsuarios();
-            return Ok(usuarios); // Retorna uma resposta HTTP 200 OK com a lista de usuários
+            return Ok(usuarios); 
         }
 
         // Endpoint para buscar um usuário por email
@@ -36,9 +37,9 @@ namespace SistemaDeTarefas.Controllers
             UsuarioModel usuario = await _usuarioRepositorio.BuscarPorId(email);
             if (usuario == null)
             {
-                return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado
+                return NotFound(); 
             }
-            return Ok(usuario); // Retorna uma resposta HTTP 200 OK com o usuário encontrado
+            return Ok(usuario); 
         }
 
         // Endpoint para login
@@ -48,7 +49,7 @@ namespace SistemaDeTarefas.Controllers
             UsuarioModel usuario = await _usuarioRepositorio.BuscarPorId(email);
             if (usuario == null)
             {
-                return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado
+                return NotFound(); 
             }
             else
             {
@@ -70,12 +71,12 @@ namespace SistemaDeTarefas.Controllers
                         responseLogin.Response = "error";
                         responseLogin.Key = null;
                     }
-                    return Ok(responseLogin); // Retorna uma resposta HTTP 200 OK com o objeto responseLogin
+                    return Ok(responseLogin); 
 
                 }
                 else
                 {
-                    return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado
+                    return NotFound(); 
                 }
                 
 
@@ -83,60 +84,25 @@ namespace SistemaDeTarefas.Controllers
             }
         }
 
-        // Enpoint de disparo de emil
-        //[HttpPost("api/email/enviar")]
-        //public async Task<ActionResult<string>> EnviarEmail([FromBody] EmailModel emailModel)
-        //{
-        //    try
-        //    {
-        //        var client = new SendGridClient("EM2YJC44WM75ZXE2C5M3SJQF");
-
-        //        var from = new EmailAddress("saboriaoficial@gmail.com", "Seu Nome");
-        //        var to = new EmailAddress(emailModel.Destinatario, "Destinatário");
-        //        var subject = emailModel.Subject;
-        //        var htmlContent = "";
-
-        //        var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlContent);
-
-        //        var response = await client.SendEmailAsync(msg);
-
-        //        if (response.StatusCode == System.Net.HttpStatusCode.OK)
-        //        {
-        //            return Ok("E-mail enviado com sucesso!");
-        //        }
-        //        else
-        //        {
-        //            return StatusCode(500, $"Erro ao enviar o e-mail: {response}");
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"Erro ao enviar o e-mail: {ex.Message}");
-        //    }
-
-        //}
-
-
         // Endpoint para cadastrar um novo usuário
         [HttpPost]
         public async Task<ActionResult<UsuarioModel>> Cadastrar([FromBody] UsuarioModel usuarioModel)
         {
             UsuarioModel usuario = await _usuarioRepositorio.Adicionar(usuarioModel);
-            return Ok(usuario); // Retorna uma resposta HTTP 200 OK com o usuário cadastrado
+            return Ok(usuario); 
         }
 
         // Endpoint para atualizar um usuário por email
         [HttpPut("{email}")]
         public async Task<ActionResult<UsuarioModel>> Atualizar([FromBody] UsuarioModel usuarioModel, string email)
         {
-            usuarioModel.Email = email; // Define o email do usuário no modelo recebido
+            usuarioModel.Email = email; 
             UsuarioModel usuario = await _usuarioRepositorio.Atualizar(usuarioModel, email);
             if (usuario == null)
             {
-                return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado para atualização
+                return NotFound(); 
             }
-            return Ok(usuario); // Retorna uma resposta HTTP 200 OK com o usuário atualizado
+            return Ok(usuario); 
         }
 
         // Endpoint para apagar um usuário por email
@@ -146,9 +112,9 @@ namespace SistemaDeTarefas.Controllers
             bool apagado = await _usuarioRepositorio.Apagar(email);
             if (!apagado)
             {
-                return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado para exclusão
+                return NotFound(); 
             }
-            return Ok(apagado); // Retorna uma resposta HTTP 200 OK indicando se o usuário foi excluído com sucesso
+            return Ok(apagado); 
         }
     }
 }

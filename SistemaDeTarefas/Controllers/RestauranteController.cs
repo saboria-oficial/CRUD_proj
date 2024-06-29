@@ -30,13 +30,29 @@ namespace SistemaDeTarefas.Controllers
             return Ok(restaurante);
         }
 
+        [HttpGet("{cnpj}/imagem")]
+        public async Task<IActionResult> ObterImagemRestaurante(string cnpj)
+        {
+            var restaurante = await _restauranteRepositorio.BuscarPorCNPJ(cnpj);
+            if (restaurante == null || restaurante.Imagem == null)
+            {
+                return NotFound();
+            }
+
+            // Converte a imagem para base64
+            string base64String = Convert.ToBase64String(restaurante.Imagem);
+            string imageDataUrl = $"data:image/png;base64,{base64String}";
+
+            return Ok(new { ImagemUrl = imageDataUrl });
+        }
+
         [HttpGet("{cnpj}/{key}")]
         public async Task<ActionResult<RestauranteModel>> Login(string cnpj, string key)
         {
             RestauranteModel rest = await _restauranteRepositorio.BuscarPorCNPJ(cnpj);
             if (rest == null)
             {
-                return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado
+                return NotFound(); 
             }
             else
             {
@@ -58,12 +74,12 @@ namespace SistemaDeTarefas.Controllers
                         responseLogin.Response = "error";
                         responseLogin.Key = null;
                     }
-                    return Ok(responseLogin); // Retorna uma resposta HTTP 200 OK com o objeto responseLogin
+                    return Ok(responseLogin); 
 
                 }
                 else
                 {
-                    return NotFound(); // Retorna uma resposta HTTP 404 Not Found se o usuário não for encontrado
+                    return NotFound(); 
                 }
 
 
@@ -72,19 +88,38 @@ namespace SistemaDeTarefas.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<RestauranteModel>> Cadastrar([FromBody] RestauranteModel restauranteModel)
+        public async Task<ActionResult<RestauranteModel>> Cadastrar([FromForm] RestauranteModel restauranteModel, [FromForm] IFormFile? imagem)
         {
+            if (imagem != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await imagem.CopyToAsync(memoryStream);
+                    restauranteModel.Imagem = memoryStream.ToArray();
+                }
+            }
+
             RestauranteModel restaurante = await _restauranteRepositorio.Adicionar(restauranteModel);
             return Ok(restaurante);
         }
 
         [HttpPut("{cnpj}")]
-        public async Task<ActionResult<RestauranteModel>> Atualizar([FromBody] RestauranteModel restauranteModel, string cnpj)
+        public async Task<ActionResult<RestauranteModel>> Atualizar([FromForm] RestauranteModel restauranteModel, [FromForm] IFormFile? imagem, string cnpj)
         {
+            if (imagem != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await imagem.CopyToAsync(memoryStream);
+                    restauranteModel.Imagem = memoryStream.ToArray();
+                }
+            }
+
             restauranteModel.Cnpj = cnpj;
             RestauranteModel restaurante = await _restauranteRepositorio.Atualizar(restauranteModel, cnpj);
             return Ok(restaurante);
         }
+
 
         [HttpDelete("{cnpj}")]
         public async Task<ActionResult<RestauranteModel>> Apagar([FromBody] RestauranteModel restauranteModel, string cnpj)

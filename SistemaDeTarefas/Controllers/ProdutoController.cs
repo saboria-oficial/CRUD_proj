@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SistemaDeTarefas.Models;
+using SistemaDeTarefas.Repositorios;
 using SistemaDeTarefas.Repositorios.Interfaces;
 
 namespace SistemaDeTarefas.Controllers
@@ -14,6 +15,23 @@ namespace SistemaDeTarefas.Controllers
         {
             _produtoRepositorio = produtoRepositorio;
         }
+
+        [HttpGet("{idproduto}/imagem")]
+        public async Task<IActionResult> ObterImagemRestaurante(string idproduto)
+        {
+            var produto = await _produtoRepositorio.BuscarPorIdProduto(idproduto);
+            if (produto == null || produto.Foto == null)
+            {
+                return NotFound();
+            }
+
+            // Converte a imagem para base64
+            string base64String = Convert.ToBase64String(produto.Foto);
+            string imageDataUrl = $"data:image/png;base64,{base64String}";
+
+            return Ok(new { ImagemUrl = imageDataUrl });
+        }
+
         [HttpGet]
         public async Task<ActionResult<List<ProdutoModel>>> BuscarTodosProdutos()
         {
@@ -29,16 +47,32 @@ namespace SistemaDeTarefas.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ProdutoModel>> Cadastrar([FromBody] ProdutoModel produtoModel)
+        public async Task<ActionResult<ProdutoModel>> Cadastrar([FromForm] ProdutoModel produtoModel, [FromForm] IFormFile? foto)
         {
+            if (foto != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await foto.CopyToAsync(memoryStream);
+                    produtoModel.Foto = memoryStream.ToArray();
+                }
+            }
             ProdutoModel produto = await _produtoRepositorio.Adicionar(produtoModel);
             return Ok(produto);
         }
 
         [HttpPut("{idproduto}")]
-        public async Task<ActionResult<ProdutoModel>> Atualizar([FromBody] ProdutoModel produtoModel, string idproduto)
+        public async Task<ActionResult<ProdutoModel>> Atualizar([FromForm] ProdutoModel produtoModel, [FromForm] IFormFile? imagem, string idproduto)
         {
-            produtoModel.IdProduto = idproduto;
+            if (imagem != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await imagem.CopyToAsync(memoryStream);
+                    produtoModel.Foto = memoryStream.ToArray();
+                }
+            }
+                produtoModel.IdProduto = idproduto;
             ProdutoModel produto = await _produtoRepositorio.Atualizar(produtoModel, idproduto);
             return Ok(produto);
         } 

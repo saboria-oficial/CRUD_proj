@@ -11,12 +11,12 @@ namespace SistemaDeTarefas.Data.Map
         {
             builder.HasKey(x => x.ID_Cliente);
             builder.Property(x => x.Nome).IsRequired().HasMaxLength(255);
-            builder.Property(x => x.Telefone).IsRequired().HasMaxLength(255);
+            builder.Property(x => x.Telefone).HasMaxLength(255);
             builder.Property(x => x.Email).IsRequired().HasMaxLength(255);
-            builder.Property(x => x.Restricao).IsRequired().HasMaxLength(255);
-            builder.Property(x => x.CEP).IsRequired().HasMaxLength(255);
+            builder.Property(x => x.Restricao).HasMaxLength(255);
+            builder.Property(x => x.CEP).HasMaxLength(255);
             builder.Property(x => x.SENHA).IsRequired().HasMaxLength(255);
-            builder.Property(x => x.Tipo).IsRequired().HasMaxLength(255);
+            builder.Property(x => x.Tipo).HasMaxLength(255);
 
         }
     }

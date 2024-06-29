@@ -16,6 +16,7 @@ namespace SistemaDeTarefas.Data.Map
             builder.Property(x => x.Senha).IsRequired().HasMaxLength(255);
             builder.Property(x => x.Telefone).IsRequired().HasMaxLength(255);
             builder.Property(x => x.Cep).IsRequired().HasMaxLength(255);
+            builder.Property(x => x.Imagem).HasColumnType("varbinary(max)"); 
             builder.Property(x => x.Email).IsRequired().HasMaxLength(255);
             builder.Property(x => x.Culinaria).IsRequired().HasMaxLength(255);
         }

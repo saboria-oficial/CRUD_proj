@@ -35,14 +35,13 @@ namespace SistemaDeTarefas.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<byte[]>("Foto")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("IdProduto")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
-
-                    b.Property<byte[]>("Imagem")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -91,6 +90,9 @@ namespace SistemaDeTarefas.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<byte[]>("Imagem")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Intolerancia")
                         .IsRequired()

@@ -41,7 +41,6 @@ namespace SistemaDeTarefas.Repositorios
             produtoPorID.IdProduto = produto.IdProduto;
             produtoPorID.Nome = produto.Nome;
             produtoPorID.Descricao = produto.Descricao;
-           // produtoPorID.Imagem = produto.Imagem;  AJUSTAR
             produtoPorID.Valor = produto.Valor;
             produtoPorID.Restricao = produto.Restricao;
 

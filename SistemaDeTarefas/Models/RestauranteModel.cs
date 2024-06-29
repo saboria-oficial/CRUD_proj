@@ -11,5 +11,6 @@
         public string? Cep { get; set; }
         public string? Email { get; set; }
         public string? Culinaria { get; set; }
+        public byte[]? Imagem { get; set; }
     }
 }
